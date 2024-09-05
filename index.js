@@ -14,12 +14,19 @@ app.get('/ejemplo', (req, res) => {
 });
 
 app.get('/pokemons/:name', async(req, res) => {
+  // Get the pokemon name from the URL
   const pokemonName = req.params.name;
 
+  //Try to fetch the pokemon data from the API
   try {
 
+    // Fetch the pokemon data from the API
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName.toLowerCase()}`);
+
+    // Parse the response as JSON
     const data = await response.json();
+
+    // If the pokemon does not exist, return a 404 status code
     if(!data){
       return res.status(404).json({
         ok: false,
@@ -27,10 +34,12 @@ app.get('/pokemons/:name', async(req, res) => {
       });
     }
     
+    // If everything went well, return the pokemon data
     return res.json({
       ok: true,
       pokemon:data,
     });
+  // If something went wrong, and an error is thrown, return a 500 status code
   } catch(error){
     return res.status(500).json({
       ok: false,
