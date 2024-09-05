@@ -13,22 +13,30 @@ app.get('/ejemplo', (req, res) => {
   });
 });
 
-app.get('/pokemons/:name', (req, res) => {
+app.get('/pokemons/:name', async(req, res) => {
   const pokemonName = req.params.name;
 
-  const pokemon = pokemons.find(
-    (pokemon) => pokemon.toLowerCase() === pokemonName.toLowerCase()
-  );
-  if (!pokemon) {
+  try {
+
+    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName.toLowerCase()}`);
+    const data = await response.json();
+    if(!data){
+      return res.status(404).json({
+        ok: false,
+        message: 'Pokemon not found',
+      });
+    }
+    
     return res.json({
-      message: 'Pokemon not found',
-      input: pokemonName,
+      ok: true,
+      pokemon:data,
+    });
+  } catch(error){
+    return res.status(500).json({
+      ok: false,
+      message: 'Something went wrong fetching the pokemon data. Maybe the pokemon does not exist.',
     });
   }
-
-  return res.json({
-    pokemon: pokemon,
-  });
 });
 
 app.listen(port, () => {
